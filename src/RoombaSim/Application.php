@@ -2,13 +2,13 @@
 
 namespace sat8bit\RoombaSim;
 
-use sat8bit\RoombaSim\Room\Room;
+use sat8bit\RoombaSim\Room\AbstractRoom;
 use sat8bit\RoombaSim\Roomba\Roomba;
 
 class Application
 {
     /**
-     * @var Room
+     * @var AbstractRoom
      */
     private $room;
 
@@ -20,10 +20,10 @@ class Application
     /**
      * constructor.
      *
-     * @param Room $room
+     * @param AbstractRoom $room
      * @param Roomba $roomba
      */
-    public function __construct(Room $room, Roomba $roomba)
+    public function __construct(AbstractRoom $room, Roomba $roomba)
     {
         $this->room = $room;
         $this->roomba = $roomba;

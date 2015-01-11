@@ -4,7 +4,7 @@ namespace sat8bit\RoombaSim\Room;
 
 use sat8bit\RoombaSim\Coordinate;
 
-class Room
+abstract class AbstractRoom
 {
     const OBSTACLE = false;
      
@@ -17,27 +17,6 @@ class Room
      */
     protected $map = array();
     
-    /**
-     * construct.
-     * 
-     * @param int $height
-     * @param int $width
-     */
-    public function __construct($height, $width, $dirt = 1)
-    {
-        if (!is_int($height) || !is_int($width) || !is_int($dirt)) {
-            throw new \InvalidArgumentException;
-        }
-
-        for ($i = 1; $i <= $height; $i++) {
-            $line = array();
-            for ($j = 1; $j <= $width; $j++) {
-                $line[$j] = $dirt;
-            }
-            $this->map[$i] = $line;
-        }
-    }
-
     /**
      * clean.
      *

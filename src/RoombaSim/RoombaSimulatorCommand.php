@@ -10,16 +10,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use sat8bit\RoombaSim\Application;
 use sat8bit\RoombaSim\Roomba;
-use sat8bit\RoombaSim\Room\Room;
+use sat8bit\RoombaSim\Room\AbstractRoom;
 use sat8bit\RoombaSim\Coordinate;
 
 class RoombaSimulatorCommand extends Command
 {
     const DEFAULT_STEP = 10000;
 
-    const DEFAULT_ROOM = "20x20";
-
-    const DEFAULT_DIRT = 1;
+    const ROOM_NAMESPACE = 'sat8bit\RoombaSim\Room\\';
+    const DEFAULT_ROOM = 'RectangleRoom15x15';
 
     protected function configure()
     {
@@ -27,7 +26,7 @@ class RoombaSimulatorCommand extends Command
             ->setName('roombasim')
             ->setDescription('roomba simurator')
             ->addArgument(
-                'ai-class-name',
+                'ai',
                 InputArgument::REQUIRED,
                 'Enter the name of RoombaAI that implements the sat8bit\Roomba\RoombaAIInterface the full path.'
             )
@@ -48,15 +47,8 @@ class RoombaSimulatorCommand extends Command
                 'room',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Enter the size of the room.',
+                'Enter the name of Room that extends the sat8bit\RoombaSim\Room\AbstractRoom the full path.',
                 self::DEFAULT_ROOM
-            )
-            ->addOption(
-                'dirt',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Enter the dirt of the room.',
-                self::DEFAULT_DIRT
             )
         ;
     }
@@ -64,29 +56,22 @@ class RoombaSimulatorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // create ai
-        $className = $input->getArgument('ai-class-name');
-        if (!class_exists($className)) {
-            throw new \InvalidArgumentException("class is not exists: $className");
+        $aiClassName = $input->getArgument('ai');
+        if (!class_exists($aiClassName)) {
+            throw new \InvalidArgumentException("class is not exists: $aiClassName");
         }
-        $ai = new $className();
+        $ai = new $aiClassName();
 
         if (!($ai instanceof Roomba\RoombaAIInterface)) {
             throw new \InvalidArgumentException("$className is not implements sat8bit\RoombaSim\Roomba\RoombaAIInterface");
         }
-
         // create roomba
-        $roomba = new Roomba\Roomba(new Coordinate(1, 1), new Roomba\Direction(), $ai);
-        // create room
-        $roomOpt = $input->getOption('room');
-        $roomSize = explode("x", $roomOpt);
-        if (count($roomSize) != 2) {
-            throw new \InvalidArgumentException("Invalid room option: $roomOpt");
-        }
-        $width = (int)$roomSize[0];
-        $height = (int)$roomSize[1];
-        $dirt = (int)$input->getOption('dirt');
-        $room = new Room($height, $width, $dirt);
+        $roomba = new Roomba\Roomba(new Coordinate(0, 0), new Roomba\Direction(), $ai);
 
+        // create room
+        $room = $this->getRoomObject($input->getOption('room'));
+
+        // application
         $app = new Application($room, $roomba);
 
         $step = (int)$input->getOption("step");
@@ -97,5 +82,25 @@ class RoombaSimulatorCommand extends Command
         }
 
         echo "Result : " . ($result ? "Cleaned($result)" : "Not cleaned.") . "\n";
+    }
+
+    /**
+     * load class.
+     *
+     * @param string $className
+     * @return AbstractRoom
+     */
+    protected function getRoomObject($className)
+    {
+        if (class_exists($className)) {
+            return new $roomClassName();
+        }
+
+        if (class_exists(self::ROOM_NAMESPACE . $className)) {
+            $className = self::ROOM_NAMESPACE . $className;
+            return new $className();
+        }
+
+        throw new \InvalidArgumentException("class is not exists: $className");
     }
 }

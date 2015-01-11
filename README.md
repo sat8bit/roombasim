@@ -31,16 +31,15 @@ packagistにあげていないのでrepositoriesも指定が必要です。
 ```
 $ vendor/bin/roombasim roombasim -help
 Usage:
- roombasim [--step="..."] [--disp] [--room="..."] [--dirt="..."] ai-class-name
+ roombasim [--step="..."] [--disp] [--room="..."] ai
 
 Arguments:
- ai-class-name         Enter the name of RoombaAI that implements the sat8bit\Roomba\RoombaAIInterface the full path.
+ ai                    Enter the name of RoombaAI that implements the sat8bit\Roomba\RoombaAIInterface the full path.
 
 Options:
  --step                step number. (default: 10000)
  --disp                display by step.
- --room                Enter the size of the room. (default: "20x20")
- --dirt                Enter the dirt of the room. (default: 1)
+ --room                Enter the name of Room that extends the sat8bit\RoombaSim\Room\AbstractRoom the full path. (default: "RectangleRoom15x15")
 ```
 
 ## つかいかた
@@ -48,7 +47,7 @@ Options:
 とりあえず動かしてみましょう。壁に当たるとランダムで回転するRoombaがデフォルトで用意してあります。
 
 ```
-$ vendor/bin/roombasim roombasim 'sat8bit\RoombaSim\Roomba\RoombaAISample' --step 100000 --room 20x20 --dirt 1
+$ vendor/bin/roombasim roombasim 'sat8bit\RoombaSim\Roomba\RoombaAISample' --step 100000
 Result : Cleaned(2935)
 ```
 
@@ -56,19 +55,6 @@ Result : Cleaned(2935)
 
 ```
 --step 100000
-```
-
-下記は部屋の大きさです。20マス*20マスという意味です。
-
-```
---room 20x20
-```
-
-１マスに存在するゴミの量です。Roombaが通るたびに1減っていき、0になるとそのマスは綺麗だという扱いになります。
-**現在の実装では、すべてのマスに均等にゴミがあります。**
-
-```
---dirt 1
 ```
 
 出力結果の2935は、実際にかかったstep数です。
@@ -81,6 +67,12 @@ Result : Cleaned(2935)
 
 ```
 --disp
+```
+
+掃除するRoomを変更する場合は下記のオプションで指定します。
+
+```
+--room 'RectangleRoom15x15'
 ```
 
 ## Roombaの作り方
@@ -203,7 +195,7 @@ class MyRoombaAI implements RoombaAIInterface
 作成したクラスをautoloadできるような場所に配置し、実行する際に名前空間を含んだクラス名を渡します。
 
 ```
-vagrant$ bin/roombasim roombasim 'sat8bit\RoombaSim\Roomba\MyRoombaAI' --step 100000 --room 20x20 --dirt 1       
+vagrant$ bin/roombasim roombasim 'sat8bit\RoombaSim\Roomba\MyRoombaAI' --step 100000
 Result : Not cleaned.
 ```
 
