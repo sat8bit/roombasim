@@ -37,10 +37,11 @@ class Application
         $room = $this->room;
         $roomba = $this->roomba;
         $count = 0;
+
         do {
+            $room->clean($roomba->getCurrentCoordinate());
             if ($room->has($roomba->getNextCoordinate())) {
                 $roomba->forward();
-                $room->clean($roomba->getCurrentCoordinate());
             }
             else {
                 $roomba->hit();
@@ -49,7 +50,7 @@ class Application
             if ($room->isClean()) {
                 break;
             }
-        }while ($count++ < $step);
+        } while($count++ < $step);
 
         return $room->isClean() ? $count : false;
     }
@@ -81,7 +82,7 @@ class Application
             usleep($sleep);
             $roomba->disp();
             $room->disp($roomba->getCurrentCoordinate());
-        }while ($count++ < $step);
+        } while($count++ < $step);
 
         return $room->isClean() ? $count : false;
     }

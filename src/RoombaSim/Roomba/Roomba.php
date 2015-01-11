@@ -61,6 +61,12 @@ class Roomba
      */
     public function getNextCoordinate()
     {
+        // 指定距離走行後の場合
+        if ($this->isRanDistance()) {
+            //現在地が次の座標になる
+            return $this->current;
+        }
+
         $d = $this->direction->getDirection();
         return new Coordinate($this->current->getX() + cos(deg2rad($d)), $this->current->getY() + sin(deg2rad($d)));
     }
@@ -70,7 +76,9 @@ class Roomba
      */
     public function forward()
     {
-        if (!is_null($this->reserveDistance) && $this->reserveDistance <= $this->distance) {
+        // 指定距離走行後の場合
+        if ($this->isRanDistance()) {
+            // 走りきったときの挙動を取得
             $motion = $this->ai->ran($this->distance);
             if (!($motion instanceof Motion)) {
                 throw new \LogicException(get_class($ai) . "::ran($distance) is not return Motion.");
@@ -92,6 +100,14 @@ class Roomba
             throw new \LogicException(get_class($ai) . "::hit($distance) is not return Motion.");
         }
         $this->setMotion($motion);
+    }
+
+    /**
+     * ran.
+     */
+    public function isRanDistance()
+    {
+        return !is_null($this->reserveDistance) && $this->reserveDistance <= $this->distance;
     }
 
     /**
