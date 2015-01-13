@@ -75,7 +75,7 @@ class RoombaSimulatorCommand extends Command
         if ($input->getOption("disp")) {
             $view = new View\ConsoleView();
         } else { 
-            $view = new View\ConsoleView();
+            $view = new View\BlackHoleView();
         }
 
         // application
