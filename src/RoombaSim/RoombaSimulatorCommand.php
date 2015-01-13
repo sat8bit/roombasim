@@ -71,15 +71,18 @@ class RoombaSimulatorCommand extends Command
         // create room
         $room = $this->getRoomObject($input->getOption('room'));
 
+        // create view
+        if ($input->getOption("disp")) {
+            $view = new View\ConsoleView();
+        } else { 
+            $view = new View\ConsoleView();
+        }
+
         // application
-        $app = new Application($room, $roomba);
+        $app = new Application($room, $roomba, $view);
 
         $step = (int)$input->getOption("step");
-        if ($input->getOption("disp")) {
-            $result = $app->runWithDisp($step);
-        } else { 
-            $result = $app->run($step);
-        }
+        $result = $app->run($step);
 
         echo "Result : " . ($result ? "Cleaned($result)" : "Not cleaned.") . "\n";
     }

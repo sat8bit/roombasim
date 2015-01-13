@@ -4,6 +4,7 @@ namespace sat8bit\RoombaSim;
 
 use sat8bit\RoombaSim\Room\AbstractRoom;
 use sat8bit\RoombaSim\Roomba\Roomba;
+use sat8bit\RoombaSim\View\AbstractView;
 
 class Application
 {
@@ -18,15 +19,21 @@ class Application
     private $roomba;
 
     /**
+     * @var AbstractView
+     */
+    private $view;
+
+    /**
      * constructor.
      *
      * @param AbstractRoom $room
      * @param Roomba $roomba
      */
-    public function __construct(AbstractRoom $room, Roomba $roomba)
+    public function __construct(AbstractRoom $room, Roomba $roomba, AbstractView $view)
     {
         $this->room = $room;
         $this->roomba = $roomba;
+        $this->view = $view;
     }
 
     /**
@@ -38,7 +45,7 @@ class Application
         $roomba = $this->roomba;
         $count = 0;
 
-        do {
+        while ($count++ < $step) {
             $room->clean($roomba->getCurrentCoordinate());
             if ($room->has($roomba->getNextCoordinate())) {
                 $roomba->forward();
@@ -50,39 +57,9 @@ class Application
             if ($room->isClean()) {
                 break;
             }
-        } while($count++ < $step);
 
-        return $room->isClean() ? $count : false;
-    }
-
-    /**
-     * run with disp.
-     *
-     * @param int $step
-     * @param int $sleep micro second
-     * @return mixed
-     */
-    public function runWithDisp($step = 100, $sleep = 50000)
-    {
-        $room = $this->room;
-        $roomba = $this->roomba;
-        $count = 0;
-        do {
-            $room->clean($roomba->getCurrentCoordinate());
-            if ($room->has($roomba->getNextCoordinate())) {
-                $roomba->forward();
-            }
-            else {
-                $roomba->hit();
-            }
-
-            if ($room->isClean()) {
-                break;
-            }
-            usleep($sleep);
-            $roomba->disp();
-            $room->disp($roomba->getCurrentCoordinate());
-        } while($count++ < $step);
+            $this->view->render($count, $roomba, $room);
+        }
 
         return $room->isClean() ? $count : false;
     }
