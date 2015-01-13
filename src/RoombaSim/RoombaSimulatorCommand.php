@@ -17,6 +17,8 @@ class RoombaSimulatorCommand extends Command
 {
     const DEFAULT_STEP = 10000;
 
+    const AI_NAMESPACE = 'sat8bit\RoombaSim\Roomba\\';
+
     const ROOM_NAMESPACE = 'sat8bit\RoombaSim\Room\\';
     const DEFAULT_ROOM = 'RectangleRoom15x15';
 
@@ -56,15 +58,8 @@ class RoombaSimulatorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // create ai
-        $aiClassName = $input->getArgument('ai');
-        if (!class_exists($aiClassName)) {
-            throw new \InvalidArgumentException("class is not exists: $aiClassName");
-        }
-        $ai = new $aiClassName();
+        $ai = $this->getAIObject($input->getArgument('ai'));
 
-        if (!($ai instanceof Roomba\RoombaAIInterface)) {
-            throw new \InvalidArgumentException("$className is not implements sat8bit\RoombaSim\Roomba\RoombaAIInterface");
-        }
         // create roomba
         $roomba = new Roomba\Roomba(new Coordinate(0, 0), new Roomba\Direction(), $ai);
 
@@ -78,13 +73,44 @@ class RoombaSimulatorCommand extends Command
             $view = new View\BlackHoleView();
         }
 
-        // application
+        // create application
         $app = new Application($room, $roomba, $view);
 
-        $step = (int)$input->getOption("step");
-        $result = $app->run($step);
+        $result = $app->run((int)$input->getOption("step"));
 
         echo "Result : " . ($result ? "Cleaned($result)" : "Not cleaned.") . "\n";
+    }
+
+    /**
+     * load ai class.
+     *
+     * @param string $className
+     * @return RoombaAIInterface
+     */
+    protected function getAIObject($className)
+    {
+        $object = $this->getObject($className, self::AI_NAMESPACE);
+        if (!($object instanceof Roomba\RoombaAIInterface)) {
+            throw new \InvalidArgumentException("$className is not implements sat8bit\RoombaSim\Roomba\RoombaAIInterface");
+        }
+
+        return $object;
+    }
+
+    /**
+     * load room class.
+     *
+     * @param string $className
+     * @return AbstractRoom
+     */
+    protected function getRoomObject($className)
+    {
+        $object = $this->getObject($className, self::ROOM_NAMESPACE);
+        if (!($object instanceof Room\AbstractRoom)) {
+            throw new \InvalidArgumentException("$className is not extends sat8bit\RoombaSim\Room\AbstractRoom");
+        }
+
+        return $object;
     }
 
     /**
@@ -93,14 +119,14 @@ class RoombaSimulatorCommand extends Command
      * @param string $className
      * @return AbstractRoom
      */
-    protected function getRoomObject($className)
+    protected function getObject($className, $namespace)
     {
         if (class_exists($className)) {
-            return new $roomClassName();
+            return new $className();
         }
 
-        if (class_exists(self::ROOM_NAMESPACE . $className)) {
-            $className = self::ROOM_NAMESPACE . $className;
+        if (class_exists($namespace . $className)) {
+            $className = $namespace . $className;
             return new $className();
         }
 
