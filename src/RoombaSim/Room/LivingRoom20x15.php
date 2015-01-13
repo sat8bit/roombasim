@@ -2,7 +2,7 @@
 
 namespace sat8bit\RoombaSim\Room;
 
-class BasicLivingRoom20x15 extends AbstractRoom
+class LivingRoom20x15 extends AbstractRoom
 {
     /**
      * @var array

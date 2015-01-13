@@ -73,7 +73,12 @@ Result : Cleaned(2935)
 
 ```
 --room 'RectangleRoom15x15'
+
+RectangleDirtyRoom15x15 :RectangleRoom15x15より汚れが激しい長方形の部屋
+LivingRoom20x15         :（想像を働かせて）L字型のソファとローテーブル、テレビ台が障害物となっている部屋
 ```
+
+
 
 ## Roombaの作り方
 
