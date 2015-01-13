@@ -125,8 +125,8 @@ class Roomba
     /**
      * disp
      */
-    public function disp()
+    public function __toString()
     {
-        echo "R({$this->distance}), C({$this->current->getX()}, {$this->current->getY()}), D({$this->direction->getDirection()})\n";
+        return "R({$this->distance}), C({$this->current->getX()}, {$this->current->getY()}), D({$this->direction->getDirection()})\n";
     }
 }

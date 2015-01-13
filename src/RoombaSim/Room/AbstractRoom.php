@@ -8,10 +8,6 @@ abstract class AbstractRoom
 {
     const OBSTACLE = false;
      
-    const DISP_RUMBA = "()";
-
-    const DISP_OBSTACLE = "XX";
-
     /**
      * @var array
      */
@@ -74,37 +70,12 @@ abstract class AbstractRoom
     }
 
     /**
-     * @param Coordinate $coordinate
+     * getMap.
+     *
+     * @return array
      */
-    public function disp(Coordinate $coordinate)
+    public function getMap()
     {
-        $disp = "";
-        foreach ($this->map as $y => $line) {
-            $disp .= "|";
-            foreach ($line as $x => $v) {
-                if ($v === self::OBSTACLE) {
-                    $disp .= self::DISP_OBSTACLE;
-                } else if ($x == (int)$coordinate->getX() && $y == (int)$coordinate->getY()) {
-                    $disp .= self::DISP_RUMBA;
-                } else {
-                    $disp .= $this->dispDirt($v);
-                }
-            }
-            $disp .= "|";
-            $disp .= "\n";
-        }
-
-        echo $disp;
+        return $this->map;
     }
-
-    protected function dispDirt($dirt) {
-        switch($dirt) {
-            case 0: return "  ";
-            case 1: return " .";
-            case 2: return "'.";
-            case 3: return ";'";
-            default: return ";;";
-        }
-    }
-
 }
